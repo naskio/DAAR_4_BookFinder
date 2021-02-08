@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  mongodb:
+    restart: always
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+    volumes:
+      - ./mongodb_data/log:/var/log/mongodb
+      - ./mongodb_data/data:/data/db
+    ports:
+      - ${MONGO_PORT}:27017
+
+  neo4j:
+    image: neo4j:latest
+    environment:
+      NEO4J_AUTH: "${NEO4J_USER}/${NEO4J_PASSWORD}"
+    volumes:
+      - ./neo4j_data/plugins:/plugins
+      - ./neo4j_data/logs:/logs
+      - ./neo4j_data/data:/data
+      - ./neo4j_data/conf:/conf
+    ports:
+      - ${NEO4J_PORT}:7687
+      - ${NEO4J_CI_PORT}:7474
+
+  web:
+    restart: always
+    build:
+      context: ./backend
+    command: [ "./wait-for-it/wait-for-it.sh","${MONGO_HOST}:${MONGO_PORT}","${NEO4J_HOST}:${NEO4J_PORT}","--","python", "manage.py","runserver","0.0.0.0:8000" ]
+    environment:
+      DOCKER: ${IS_DOCKER}
+      DEBUG: ${DJANGO_DEBUG}
+      SECRET_KEY: ${DJANGO_SECRET_KEY}
+      MONGO_HOST: ${MONGO_HOST}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_DB: ${MONGO_DB}
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      NEO4J_HOST: ${NEO4J_HOST}
+      NEO4J_PORT: ${NEO4J_PORT}
+      NEO4J_USER: ${NEO4J_USER}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+    volumes:
+      - ./backend/media:/app/media
+    ports:
+      - ${DJANGO_PORT}:8000
+    links:
+      - mongodb:${MONGO_HOST}
+      - neo4j:${NEO4J_HOST}
+    depends_on:
+      - neo4j
+      - mongodb
+
+  frontend: # or we can build React App and serve it from Django
+    restart: always
+    build:
+      context: ./frontend
+    command: [ "nginx", "-g", "daemon off;" ]
+    environment:
+      REACT_APP_DOCKER: ${IS_DOCKER}
+      REACT_APP_BACKEND_URL: 'http://${DJANGO_HOST}:${DJANGO_PORT}'
+    ports:
+      - ${WEB_PORT}:7000
+    links:
+      - web:${DJANGO_HOST}
+    depends_on:
+      - web
