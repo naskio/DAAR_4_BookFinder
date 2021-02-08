@@ -1,0 +1,29 @@
+export default {
+    // FONT FAMILY
+    FONT_FAMILY: 'Roboto',
+    ARABIC_FONT_FAMILY: 'Roboto',
+    // FONT SIZE
+    SIZE_SMALL: '1rem',
+    SIZE_MEDIUM: '2rem',
+    SIZE_LARGE: '3rem',
+    // FONT WEIGHT
+    WEIGHT_LIGHT: 200,
+    WEIGHT_REGULAR: 400,
+    WEIGHT_MEDIUM: 600,
+    WEIGHT_BOLD: 800,
+    WEIGHT_BLACK: 900,
+    // COLORS
+    // COLOR_PRIMARY_LIGHT: '#ef5350',
+    COLOR_PRIMARY: '#0061BF',
+    // COLOR_PRIMARY_DARK: '#b71c1c',
+    // COLOR_SECONDARY_DARK: '#4b61c0',
+    // COLOR_SECONDARY: '#5887F9',
+    // COLOR_SECONDARY_LIGHT: '#598cff',
+    COLOR_WHITE: '#ffffff',
+    COLOR_LIGHTER: '#afafaf',
+    COLOR_LIGHT: '#707070',
+    COLOR_DEFAULT: '#4b4b4b',
+    COLOR_DARK: '#313131',
+    COLOR_DARKER: '#1b1b1b',
+    COLOR_BLACK: '#000000',
+};
