@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/DAAR_4_BookFinder/static/css/main.abdcf7b0.chunk.css",
+    "main.js": "/DAAR_4_BookFinder/static/js/main.01ea2c5a.chunk.js",
+    "main.js.map": "/DAAR_4_BookFinder/static/js/main.01ea2c5a.chunk.js.map",
+    "runtime-main.js": "/DAAR_4_BookFinder/static/js/runtime-main.4cf84ef3.js",
+    "runtime-main.js.map": "/DAAR_4_BookFinder/static/js/runtime-main.4cf84ef3.js.map",
+    "static/js/2.542f329a.chunk.js": "/DAAR_4_BookFinder/static/js/2.542f329a.chunk.js",
+    "static/js/2.542f329a.chunk.js.map": "/DAAR_4_BookFinder/static/js/2.542f329a.chunk.js.map",
+    "static/js/3.1c269ea6.chunk.js": "/DAAR_4_BookFinder/static/js/3.1c269ea6.chunk.js",
+    "static/js/3.1c269ea6.chunk.js.map": "/DAAR_4_BookFinder/static/js/3.1c269ea6.chunk.js.map",
+    "index.html": "/DAAR_4_BookFinder/index.html",
+    "static/css/main.abdcf7b0.chunk.css.map": "/DAAR_4_BookFinder/static/css/main.abdcf7b0.chunk.css.map",
+    "static/js/2.542f329a.chunk.js.LICENSE.txt": "/DAAR_4_BookFinder/static/js/2.542f329a.chunk.js.LICENSE.txt",
+    "static/media/logo_text.2fb3e3bc.svg": "/DAAR_4_BookFinder/static/media/logo_text.2fb3e3bc.svg",
+    "static/media/logo_text.63403a75.png": "/DAAR_4_BookFinder/static/media/logo_text.63403a75.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.4cf84ef3.js",
+    "static/js/2.542f329a.chunk.js",
+    "static/css/main.abdcf7b0.chunk.css",
+    "static/js/main.01ea2c5a.chunk.js"
+  ]
+}
