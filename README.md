@@ -55,7 +55,6 @@ The system supports indexing books from ```gutenber.org``` (it can be expanded e
 ## Getting started
 
 These instructions will get you a copy of the project up and running on your local machine or in a production server.
-(Start by )
 
 ### Requirements
 
