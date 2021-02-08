@@ -10,26 +10,29 @@ def get_books():
     has_next = True
     page = 1
     while has_next:
-        res = requests.get(GUTENDEX_API, params={
-            "page": page,
-        })
-        if res:
-            res = res.json()
-            if res.get('next'):
-                page += 1
-            else:
-                has_next = False
-            results = res.get('results')
-            if results:
-                for book in results:
-                    download_link = book.get('formats', {}).get('text/plain; charset=utf-8')
-                    if download_link and download_link.endswith('.txt'):
-                        ll = book.get('languages')
-                        if ll and ll[0] == 'en':
-                            yield book
+        try:
+            res = requests.get(GUTENDEX_API, params={
+                "page": page,
+            })
+            if res:
+                res = res.json()
+                if res.get('next'):
+                    page += 1
+                else:
+                    has_next = False
+                results = res.get('results')
+                if results:
+                    for book in results:
+                        download_link = book.get('formats', {}).get('text/plain; charset=utf-8')
+                        if download_link and download_link.endswith('.txt'):
+                            ll = book.get('languages')
+                            if ll and ll[0] == 'en':
+                                yield book
+                else:
+                    yield None
             else:
                 yield None
-        else:
+        except:
             yield None
 
 

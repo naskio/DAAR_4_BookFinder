@@ -5,10 +5,13 @@ import pprint as p_printer
 
 
 def get_text_from_url(url: str) -> str:
-    res = requests.get(url)
-    if res:
-        return res.text
-    else:
+    try:
+        res = requests.get(url)
+        if res:
+            return res.text
+        else:
+            return ""
+    except:
         return ""
 
 

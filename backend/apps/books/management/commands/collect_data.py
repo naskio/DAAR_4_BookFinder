@@ -27,28 +27,38 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         g_books = get_books()
-        for x in range(0, min(settings.BOOKS_NUMBER, options['n'])):
-            b_dict = next(g_books)
-            if not Book.objects.filter(gutenberg_id=b_dict.get('id')).exists():
-                b_dict = gutenberg_to_dict(b_dict)
-                b = Book(**b_dict)
-                b.save()
-                for y in b_dict.get('keywords'):
-                    if not Keyword.objects.filter(keyword=y['keyword']).exists():
-                        kw = Keyword(keyword=y['keyword'],
-                                     books=[{
-                                         'book_gutenberg_id': b_dict['gutenberg_id'],
-                                         'occurrence_number': y['occurrence_number'],
-                                     }])
-                        kw.save()
+        i = 0
+        for x in range(0, min(settings.MAX_BOOKS_NUMBER, options['n'])):
+            i += 1
+            try:
+                b_dict = next(g_books)
+                if not Book.objects.filter(gutenberg_id=b_dict.get('id')).exists():
+                    b_dict = gutenberg_to_dict(b_dict)
+                    if b_dict.get('keywords'):
+                        b = Book(**b_dict)
+                        b.save()
+                        for y in b_dict.get('keywords'):
+                            if not Keyword.objects.filter(keyword=y['keyword']).exists():
+                                kw = Keyword(keyword=y['keyword'],
+                                             books=[{
+                                                 'book_gutenberg_id': b_dict['gutenberg_id'],
+                                                 'occurrence_number': y['occurrence_number'],
+                                             }])
+                                kw.save()
+                            else:
+                                kw = Keyword.objects.filter(keyword=y['keyword'])
+                                for obj in kw[:1]:
+                                    obj.books.append({
+                                        'book_gutenberg_id': b_dict['gutenberg_id'],
+                                        'occurrence_number': y['occurrence_number'],
+                                    })
+                                    obj.save()
+                        print(i, ' - ', 'saved', b.gutenberg_id, b.title)
                     else:
-                        kw = Keyword.objects.filter(keyword=y['keyword'])
-                        for obj in kw[:1]:
-                            obj.books.append({
-                                'book_gutenberg_id': b_dict['gutenberg_id'],
-                                'occurrence_number': y['occurrence_number'],
-                            })
-                            obj.save()
-                print('saved', b.gutenberg_id, b.title)
-            else:
-                print(b_dict.get('id'), 'already exists')
+                        print(i, ' - ', b_dict.get('id'), 'empty keywords')
+                else:
+                    print(i, ' - ', b_dict.get('id'), 'already exists')
+            except:
+                pass
+            if i % 50 == 0:
+                input("Press Enter to continue...")

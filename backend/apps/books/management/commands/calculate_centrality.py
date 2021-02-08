@@ -64,7 +64,7 @@ class Command(BaseCommand):
             with driver.session() as session:
                 session.write_transaction(remove_undirected_graph)
         except Exception as e:
-            print(e)
+            pass
 
         with driver.session() as session:
             session.write_transaction(create_undirected_graph)

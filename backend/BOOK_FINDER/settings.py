@@ -20,8 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DEBUG=(bool, False),
     DOCKER=(bool, False),
-    # ES_HOST=(str, 'localhost'),
-    # ES_PORT=(str, '9200'),
+    NEO4J_HOST=(str, 'localhost'),
+    NEO4J_PORT=(str, '7687'),
+    NEO4J_USER=(str, 'neo4j'),
+    MONGO_DB=(str, 'BookFinder'),
+    MONGO_HOST=(str, 'localhost'),
+    MONGO_PORT=(int, 27017),
 )
 environ.Env.read_env(env_file='.env')
 
@@ -108,48 +112,30 @@ WSGI_APPLICATION = 'BOOK_FINDER.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-if DOCKER:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('POSTGRES_DB') or 'postgres',
-            'USER': env('POSTGRES_USER') or 'postgres',
-            'PASSWORD': env('POSTGRES_PASSWORD') or None,
-            'HOST': env('POSTGRES_HOST') or 'database',
-            'PORT': env('POSTGRES_PORT') or 5432,
-        }
-    }
-else:
-    # DATABASES = {
-    #     'default': {
-    #         'ENGINE': 'django.db.backends.sqlite3',
-    #         'NAME': BASE_DIR / 'db.sqlite3',
-    #     }
-    # }
-    DATABASES = {
-        'default': {
-            'ENGINE': 'djongo',
-            'NAME': 'BookFinder',
-            'ENFORCE_SCHEMA': False,
-            'CLIENT': {
-                'host': 'localhost',
-                'port': 27017,
-                # 'username': 'db-username',
-                # 'password': 'password',
-                # 'authSource': 'db-name',
-                # 'authMechanism': 'SCRAM-SHA-1'
+DATABASES = {
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': env('MONGO_DB'),
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': env('MONGO_HOST'),
+            'port': env('MONGO_PORT'),
+            'username': env('MONGO_USER') or None,
+            'password': env('MONGO_PASSWORD') or None,
+            # 'authMechanism': 'SCRAM-SHA-1'
+            # 'authSource': 'db-name',
+        },
+        'LOGGING': {
+            'version': 1,
+            'loggers': {
+                'djongo': {
+                    'level': 'DEBUG',
+                    'propagate': False,
+                }
             },
-            'LOGGING': {
-                'version': 1,
-                'loggers': {
-                    'djongo': {
-                        'level': 'DEBUG',
-                        'propagate': False,
-                    }
-                },
-            },
-        }
+        },
     }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -295,15 +281,20 @@ DATE_FORMAT = 'Y-m-d'
 DATETIME_FORMAT = 'Y-m-d H:m:s'
 
 # my custom vars
-BOOKS_NUMBER = 100
-MAX_KEYWORDS_PER_BOOK = 1500
-AUTOCOMPLETE_NUMBER = 10
+# books and graph
+MAX_BOOKS_NUMBER = 2000
+MAX_KEYWORDS_PER_BOOK = 1000
+JACCARD_DISTANCE_THETA = 0.5
+# auto-correct
 SIMILARITY_MIN = 0.5
 SIMILARITY_THRESHOLD = 0.85
-JACCARD_DISTANCE_THETA = 0.5
+# results
+AUTOCOMPLETE_NUMBER = 10
+BOOKS_RESULT_NUMBER = 12
+SIMILAR_BOOKS_NUMBER = 6
 
 # neo4j
-NEO4J_HOST = 'localhost'
-NEO4J_PORT = '7687'
-NEO4J_USER = 'neo4j'
-NEO4J_PASSWORD = '12345678'
+NEO4J_HOST = env('NEO4J_HOST')
+NEO4J_PORT = env('NEO4J_PORT')
+NEO4J_USER = env('NEO4J_USER')
+NEO4J_PASSWORD = env('NEO4J_PASSWORD')

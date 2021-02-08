@@ -42,7 +42,8 @@ def get_similar_books(gutenberg_id) -> List:
 
     with driver.session() as session:
         results = session.read_transaction(get_connected_nodes, gutenberg_id)
-        queryset = Book.objects.filter(gutenberg_id__in=results)[:5]
+        queryset = Book.objects.filter(gutenberg_id__in=results).order_by('-centrality_rank')[
+                   :settings.SIMILAR_BOOKS_NUMBER]
         serializer = BookSerializer(queryset, many=True)
     driver.close()
     return serializer.data
@@ -59,7 +60,8 @@ class SearchViewSet(viewsets.ViewSet):
         is_advanced = serializer.validated_data.get('advanced')
         if not keyword:
             return Response([])
-        occurrences = {}
+        # occurrences = {}
+        matched = set()
         if not is_advanced:
             # case keyword
             from .nlp import clean, stem
@@ -68,29 +70,36 @@ class SearchViewSet(viewsets.ViewSet):
             res = Keyword.objects.filter(keyword=keyword_cleaned)
             for x in res:
                 for y in x.books:
-                    if y['book_gutenberg_id'] in occurrences:
-                        occurrences[y['book_gutenberg_id']] = occurrences[y['book_gutenberg_id']] + y[
-                            'occurrence_number']
-                    else:
-                        occurrences[y['book_gutenberg_id']] = y['occurrence_number']
+                    matched.add(y['book_gutenberg_id'])
+                    # if y['book_gutenberg_id'] in occurrences:
+                    #     occurrences[y['book_gutenberg_id']] = occurrences[y['book_gutenberg_id']] + y[
+                    #         'occurrence_number']
+                    # else:
+                    #     occurrences[y['book_gutenberg_id']] = y['occurrence_number']
         else:
             # case regex
             res = Keyword.objects.mongo_find({'keyword': {"$regex": keyword}})
             for x in res:
                 # print(x['keyword'])
                 for y in x['books']:
-                    if y['book_gutenberg_id'] in occurrences:
-                        occurrences[y['book_gutenberg_id']] = occurrences[y['book_gutenberg_id']] + y[
-                            'occurrence_number']
-                    else:
-                        occurrences[y['book_gutenberg_id']] = y['occurrence_number']
-        books = Book.objects.filter(gutenberg_id__in=occurrences.keys())
-        data = sorted(books, key=lambda xx: occurrences[xx.gutenberg_id], reverse=True)
-        # print(data)
-        serializer = BookSerializer(data=data, many=True)
+                    matched.add(y['book_gutenberg_id'])
+                    # if y['book_gutenberg_id'] in occurrences:
+                    #     occurrences[y['book_gutenberg_id']] = occurrences[y['book_gutenberg_id']] + y[
+                    #         'occurrence_number']
+                    # else:
+                    #     occurrences[y['book_gutenberg_id']] = y['occurrence_number']
+        # books = Book.objects.filter(gutenberg_id__in=occurrences.keys())
+        books = Book.objects.filter(gutenberg_id__in=list(matched)).order_by('-centrality_rank')[
+                :settings.BOOKS_RESULT_NUMBER]
+        # data = sorted(books, key=lambda xx: occurrences[xx.gutenberg_id], reverse=True)
+        # data = sorted(books, key=lambda xx: xx.centrality_rank, reverse=True)
+        serializer = BookSerializer(data=books, many=True)
         serializer.is_valid(False)
         if not serializer.data:
-            return Response(suggest_word(keyword) or [])
+            if not is_advanced:
+                return Response(suggest_word(keyword) or [])
+            else:
+                return Response([])
         return Response(serializer.data)
 
 
@@ -104,12 +113,10 @@ class AutoCompleteViewSet(viewsets.ViewSet):
         q = serializer.validated_data.get('q')
         if not q:
             return Response([])
-        res = Keyword.objects.mongo_find({'keyword': {"$regex": f"^{q}.*$"}})
+        res = Keyword.objects.mongo_find({'keyword': {"$regex": f"^{q}.*$", }}).limit(settings.AUTOCOMPLETE_NUMBER)
         suggestions = []
         for x in res:
             suggestions.append(x['keyword'])
-            if len(suggestions) > settings.AUTOCOMPLETE_NUMBER:
-                break
         return Response(suggestions)
 
 
