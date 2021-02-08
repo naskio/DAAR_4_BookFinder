@@ -53,7 +53,7 @@ class Command(BaseCommand):
                                         'occurrence_number': y['occurrence_number'],
                                     })
                                     obj.save()
-                        print(i, ' - ', 'saved', b.gutenberg_id, b.title)
+                        print(i, ' - ', 'Indexed', b.gutenberg_id, b.title)
                     else:
                         print(i, ' - ', b_dict.get('id'), 'empty keywords')
                 else:
