@@ -1,7 +1,7 @@
 import React from "react";
 import {
-    // BrowserRouter as Router, // for heroku
-    HashRouter as Router, // for github pages
+    BrowserRouter as Router, // for heroku
+    // HashRouter as Router, // for github pages
     // Route,
     Switch,
 } from "react-router-dom";
@@ -24,9 +24,9 @@ export default class extends React.PureComponent {
                 <Helmet>
                     <title>{title}</title>
                 </Helmet>
-                {/*<Router> /!*for browserRouter *!/*/}
-                {/*<Router basename={BASE_NAME}> /!*for browserRouter with github pages*!/*/}
-                <Router basename='/'> {/*for hashRouter*/}
+                <Router> {/*for browserRouter */}
+                    {/*<Router basename={BASE_NAME}> /!*for browserRouter with github pages*!/*/}
+                    {/*<Router basename='/'> /!*for hashRouter*!/*/}
                     {
                         !empty ? (
                                 <Switch>
